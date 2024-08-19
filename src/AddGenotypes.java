@@ -31,11 +31,12 @@ public class AddGenotypes {
 	/*
 	 * To add other FORMAT fields, add their details here and add the logic to initialize them in reformatVariantFormat
 	 */
-	static String[] newFieldNames = {"GT", "IS", "OT", "DV", "DR"};
-	static String[] newFieldNums = {"1", "1", "1", "1", "1"};
-	static String[] newFieldTypes = {"String", "String", "String", "String", "String"};
+	static String[] newFieldNames = {"GT", "GQ", "IS", "OT", "DV", "DR"};
+	static String[] newFieldNums = {"1", "1", "1", "1", "1", "1"};
+	static String[] newFieldTypes = {"String", "String", "String", "String", "String", "String"};
 	static String[] newFieldDescs = new String[] {
 			"The genotype of the variant",
+			"The genotype quality",
 			"Whether or not the variant call was marked as specific due to high read support and length",
 			"The original type of the variant",
 			"The number of reads supporting the variant sequence",
@@ -214,8 +215,8 @@ public class AddGenotypes {
 					}
 					else
 					{
-						// Fill fields with "NA" but use "./." or "0|0" for genotype
-						String val = "NA";
+						// Fill fields with "." but use "./." or "0|0" for genotype
+						String val = ".";
 						if(fieldName.equals("GT"))
 						{
 							if(Settings.DEFAULT_ZERO_GENOTYPE)
@@ -266,6 +267,18 @@ public class AddGenotypes {
 							res.sampleFieldValues[j][i] = "0|0";
 						}
 						res.sampleFieldValues[j][i] = "./.";
+					}
+				}
+				else if(field.equals("GQ"))
+				{
+					String oldGq = oldVariant.getValue(j, "GQ");
+					if(oldGq.length() > 0)
+					{
+						res.sampleFieldValues[j][i] = oldGq;
+					}
+					else
+					{
+						res.sampleFieldValues[j][i] = ".";
 					}
 				}
 				else if(field.equals("IS"))
@@ -460,7 +473,7 @@ public class AddGenotypes {
 		String[][] sampleFieldValues;
 		
 		/*
-		 * Initialize the format fields with all "NA" values
+		 * Initialize the format fields with all "." values
 		 */
 		VariantFormatField(int numSamples, String[] fieldNames)
 		{
@@ -468,7 +481,7 @@ public class AddGenotypes {
 			sampleFieldValues = new String[numSamples][fieldNames.length];
 			for(int i = 0; i<numSamples; i++)
 			{
-				Arrays.fill(sampleFieldValues[i], "NA");
+				Arrays.fill(sampleFieldValues[i], ".");
 			}
 		}
 		
